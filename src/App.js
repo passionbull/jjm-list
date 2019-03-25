@@ -4,23 +4,20 @@ import {
   Text,
   View,
   Platform,
-  TouchableHighlight, TouchableOpacity,
+  TouchableOpacity,
   FlatList
 } from 'react-native';
 import SSC from 'sscjs';
 
-
-
-class MyListItem extends React.PureComponent {
+class HolderListItem extends React.PureComponent {
   _onPress = () => {
   };
   render() {
     return (
-      <TouchableOpacity onPress={this._onPress}>
         <View style={styles.listView}>
           <Text style={styles.item}>{this.props.title}</Text>
+          <Text style={styles.item2}>{1*this.props.rate}</Text>
         </View>
-      </TouchableOpacity>
     );
   }
 }
@@ -28,8 +25,9 @@ class MyListItem extends React.PureComponent {
 class App extends Component {
   state = {
     holders: [],
-    holders_data: [],
-    symbol: ''
+    symbol: '',
+    maintainer: ['virus707', 'goldenticket', 'jjm13'],
+    real_maintainer: []
   }
 
 
@@ -45,45 +43,78 @@ class App extends Component {
       result.sort(function (a,b){
         return b.balance - a.balance;
       });
-
       for (var holder of result) {
         tHolders.push(holder)
-        var text = holder.account+': '+holder.balance+' '+symbol
-        tData.push({key: text})
       }
       console.log(tHolders);
+      var sumBalance = 0;
 
-      this.setState({holders: tHolders,
-      holders_data: tData});
+      /// add all balances
+      for (const holder of tHolders) {
+          sumBalance = sumBalance + 1*(holder.balance);
+      }
+
+      /// remove maintainer balances
+      for (const mt of this.state.maintainer) {
+        var maintainer = this.findAccount(tHolders,mt);
+        if(maintainer !== undefined) 
+          sumBalance = sumBalance - maintainer.balance;
+      }
+      console.log('sum balance : '+ sumBalance);
+
+      
+      /// calculate rate
+      for (const holder of tHolders) {
+        holder.rate = holder.balance / sumBalance;
+
+        for (const mt of this.state.maintainer) {
+          if(holder.account === mt) 
+            holder.rate = 0;
+        }
+        var text = holder.account+': '+(holder.balance*1).toFixed(2)+' '+symbol
+        tData.push({key: text, rate: (holder.rate*1).toFixed(3)})
+      }
+      this.setState({holders: tHolders, holders_data: tData});
     })
 
   }
 
+  findAccount = (holders, account) =>
+  {
+    return holders.find(function(a){return a.account === account;});
+  }
+
   componentDidMount(){
-    var symbol = 'JJM'
-    this.setState({symbol});
-    this.sscLoad(symbol);
+    var _symbol = 'JJM'
+    this.setState({symbol:_symbol});
+    this.sscLoad(_symbol);
   }
 
   onClick = () => {
-    this.sscLoad('JJM');
+    this.sscLoad(this.state.symbol);
   }
 
-  render() {
 
+
+
+
+  render() {
     return (
       <View style={styles.container}>
-        <TouchableHighlight
+          <Text style={{color: 'black', fontWeight: 'bold', fontSize: 16}}>총 홀더 수 : {this.state.holders.length}</Text>
+      {
+        /* <View style={{flexDirection: 'row'}}>
+        <TouchableOpacity
           onPress={this.onClick}
           style={styles.button}
           underlayColor={'#0A84D0'}
         >
-          <Text style={styles.buttonText}>Get {this.state.symbol} List</Text>
-        </TouchableHighlight>
+          <Text style={styles.buttonText}>새로고침 {this.state.symbol} 리스트</Text>
+        </TouchableOpacity>
+      </View> */}
         <FlatList
           data= {this.state.holders_data}
-          // renderItem={({item}) => <Text style={styles.item}>{item.key}</Text>}
-          renderItem={({item}) => <MyListItem id={item.id} title ={item.key}/>}
+          renderItem={({item}) => <HolderListItem id={item.id} title ={item.key} rate = {item.rate}/>}
         />
       </View>
     );
@@ -112,6 +143,13 @@ const styles = StyleSheet.create({
     marginTop: 10,
     backgroundColor: '#1B95E0',
   },
+  button2: {
+    borderRadius: 3,
+    padding: 20,
+    marginVertical: 10,
+    marginTop: 10,
+    backgroundColor: '#1B05E0',
+  },
   buttonText: {
     color: '#fff',
     fontWeight: 'bold',
@@ -125,6 +163,12 @@ const styles = StyleSheet.create({
     padding: 5,
     fontSize: 18,
     height: 30,
+  },
+  item2: {
+    padding: 5,
+    fontSize: 18,
+    height: 30,
+    fontWeight: 'bold'
   },
 });
 
