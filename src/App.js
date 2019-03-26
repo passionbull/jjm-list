@@ -27,7 +27,8 @@ class App extends Component {
     holders: [],
     symbol: '',
     maintainer: ['virus707', 'goldenticket', 'jjm13'],
-    real_maintainer: []
+    real_maintainer: [],
+    sum_balance:''
   }
 
 
@@ -61,6 +62,7 @@ class App extends Component {
           sumBalance = sumBalance - maintainer.balance;
       }
       console.log('sum balance : '+ sumBalance);
+      this.setState({sum_balance: sumBalance});
 
       
       /// calculate rate
@@ -74,7 +76,7 @@ class App extends Component {
         var text = holder.account+': '+(holder.balance*1).toFixed(2)+' '+symbol
         tData.push({key: text, rate: (holder.rate*1).toFixed(3)})
       }
-      this.setState({holders: tHolders, holders_data: tData});
+      this.setState({holders: tHolders, holders_data: tData, sum_balance: sumBalance});
     })
 
   }
@@ -102,6 +104,7 @@ class App extends Component {
     return (
       <View style={styles.container}>
           <Text style={{color: 'black', fontWeight: 'bold', fontSize: 16}}>총 홀더 수 : {this.state.holders.length}</Text>
+          <Text style={{color: 'black', fontWeight: 'bold', fontSize: 16}}>유통물량 : {(this.state.sum_balance*1).toFixed(2)} JJM</Text>
       {
         /* <View style={{flexDirection: 'row'}}>
         <TouchableOpacity

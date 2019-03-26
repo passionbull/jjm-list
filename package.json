@@ -1,5 +1,6 @@
 {
-  "name": "myApp",
+  "name": "jjm_holders",
+  "homepage": "http://passionbull.github.io/jjm-list",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -15,7 +16,10 @@
     "test:native": "node scripts/test.js --config \"./config/native.jest.config.js\"",
     "test:native-watch": "node scripts/test.js --watch --config \"./config/native.jest.config.js\"",
     "coverage": "node scripts/test.js --coverage --config \"./config/web.jest.config.js\"",
-    "coverage:native": "node scripts/test.js --config \"./config/native.jest.config.js\" --coverage"
+    "coverage:native": "node scripts/test.js --config \"./config/native.jest.config.js\" --coverage",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build"
+
   },
   "dependencies": {
     "react": "^16.6.x",
@@ -52,6 +56,7 @@
     "file-loader": "2.0.0",
     "fork-ts-checker-webpack-plugin-alt": "0.4.14",
     "fs-extra": "7.0.0",
+    "gh-pages": "^2.0.1",
     "html-webpack-plugin": "4.0.0-alpha.2",
     "identity-obj-proxy": "3.0.0",
     "jest": "23.6.0",
