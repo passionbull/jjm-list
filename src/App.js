@@ -8,17 +8,26 @@ import {
   FlatList
 } from 'react-native';
 import SSC from 'sscjs';
-
 class HolderListItem extends React.PureComponent {
   _onPress = () => {
   };
   render() {
     return (
-        <View style={styles.listView}>
-          <Text style={styles.item}>{this.props.title}</Text>
-          <Text style={styles.item2}>{1*this.props.rate}</Text>
+        <View style={{flex: 1, flexDirection: 'row', paddingTop: 5,}}>
+          <View style={{flex: 1, borderWidth: 0.1}}>
+            <Text style={{flex: 1, color: 'black', fontSize: 15, padding: 3}}>{this.props.account}</Text>
+          </View>
+
+          <View style={{flex: 1, borderWidth:0.1}}>
+            <Text style={{flex: 1, color: 'black', fontSize: 15, padding: 3}}>{this.props.balance}</Text>
+          </View>
+
+          <View style={{flex: 1, borderWidth:0.1}}>
+            <Text style={{flex: 1, color: 'black', fontSize: 15, padding: 3, paddingLeft:10}}>{1*this.props.rate}</Text>
+          </View>
         </View>
-    );
+
+      );
   }
 }
 
@@ -37,6 +46,17 @@ class App extends Component {
     ssc.stream((err, res) => {
         // console.log(err, res);
     });
+
+    ssc.find('market', 'metrics', {'symbol':symbol}, 1000, 0, [], (err, result) => {
+      this.setState({
+        lastPrice: result[0].lastPrice,
+        volume: result[0].volume,
+        highestBid: result[0].highestBid,
+        lowestAsk: result[0].lowestAsk
+      });
+    });
+
+
     ssc.find('tokens', 'balances', {'symbol':symbol}, 1000, 0, [], (err, result) => {
       var tHolders = []
       var tData = []
@@ -74,7 +94,7 @@ class App extends Component {
             holder.rate = 0;
         }
         var text = holder.account+': '+(holder.balance*1).toFixed(2)+' '+symbol
-        tData.push({key: text, rate: (holder.rate*1).toFixed(3)})
+        tData.push({account: holder.account, balance: (holder.balance*1).toFixed(2)+' '+symbol, rate: (holder.rate*1).toFixed(3)})
       }
       this.setState({holders: tHolders, holders_data: tData, sum_balance: sumBalance});
     })
@@ -102,22 +122,21 @@ class App extends Component {
 
   render() {
     return (
-      <View style={styles.container}>
-          <Text style={{color: 'black', fontWeight: 'bold', fontSize: 16}}>총 홀더 수 : {this.state.holders.length}</Text>
+      <View style={{flex: 1,}}>
+          <Text style={{color: 'black', fontWeight: 'bold', fontSize: 20, paddingTop: 20, paddingBottom:3}}>Token Info</Text>
+          <Text style={{color: 'black', fontSize: 15, paddingBottom: 5}}>Last: {this.state.lastPrice} STEEM, 24h Vol: {this.state.volume} STEEM, Bid: {this.state.highestBid} STEEM, Ask: {this.state.lowestAsk} STEEM</Text>
+          <Text style={{color: 'black', fontWeight: 'bold', fontSize: 16, paddingBottom: 3}}>총 홀더 수 : {this.state.holders.length}</Text>
           <Text style={{color: 'black', fontWeight: 'bold', fontSize: 16}}>유통물량 : {(this.state.sum_balance*1).toFixed(2)} JJM</Text>
-      {
-        /* <View style={{flexDirection: 'row'}}>
-        <TouchableOpacity
-          onPress={this.onClick}
-          style={styles.button}
-          underlayColor={'#0A84D0'}
-        >
-          <Text style={styles.buttonText}>새로고침 {this.state.symbol} 리스트</Text>
-        </TouchableOpacity>
-      </View> */}
+
+      <View style={{flex: 1, flexDirection: 'row', paddingTop: 30}}>
+        <Text style={{flex: 1, color: 'black', fontWeight: 'bold', fontSize: 20, padding: 3}}>Account</Text>
+        <Text style={{flex: 1, color: 'black', fontWeight: 'bold', fontSize: 20, padding: 3}}>Balance</Text>
+        <Text style={{flex: 1,color: 'black', fontWeight: 'bold', fontSize: 20, padding: 3}}>Rate</Text>
+      </View>
+
         <FlatList
           data= {this.state.holders_data}
-          renderItem={({item}) => <HolderListItem id={item.id} title ={item.key} rate = {item.rate}/>}
+          renderItem={({item}) => <HolderListItem id={item.id} account ={item.account} balance = {item.balance} rate = {item.rate}/>}
         />
       </View>
     );
