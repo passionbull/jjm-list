@@ -286,8 +286,10 @@ module.exports = {
           // The preset includes JSX, Flow, TypeScript and some ESnext features.
           {
             test: /\.(js|mjs|jsx|ts|tsx)$/,
-            include: paths.appSrc,
-
+            include: [
+              paths.appSrc,
+              `${paths.appNodeModules}/react-native-table-component`,
+            ],
             loader: require.resolve('babel-loader'),
             options: {
               customize: require.resolve(
@@ -295,7 +297,8 @@ module.exports = {
               ),
               
               plugins: [
-                [
+                "@babel/plugin-proposal-class-properties",
+                [ 
                   require.resolve('babel-plugin-named-asset-import'),
                   {
                     loaderMap: {

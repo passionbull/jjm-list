@@ -1,3 +1,5 @@
+/build
+/node_modules
 /build/asset-manifest.json
 /build/favicon.ico
 /build/index.html
@@ -2299,3 +2301,4 @@
 /node_modules/.cache/terser-webpack-plugin/index-v5/8b/d0/28d79426967135275b3337e9d6bde0a0bf8db01069bc2e72bda6b6f4969d
 /node_modules/.cache/terser-webpack-plugin/index-v5/aa/3a/5615596e658a1fcc6b96dc8842185824544f1a80708c687489195cd434c7
 /node_modules/gh-pages/.cache/github.com!passionbull!jjm-list.git/
+/node_modules/.cache/babel-loader/000123fe976ede4a7d2a04b49695ac29.json

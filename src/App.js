@@ -8,6 +8,7 @@ import {
   FlatList
 } from 'react-native';
 import SSC from 'sscjs';
+import { Table, Row, Rows } from 'react-native-table-component';
 class HolderListItem extends React.PureComponent {
   _onPress = () => {
   };

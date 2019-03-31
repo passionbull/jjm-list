@@ -213,7 +213,10 @@ module.exports = {
           // The preset includes JSX, Flow, and some ESnext features.
           {
             test: /\.(js|mjs|jsx|ts|tsx)$/,
-            include: paths.appSrc,
+            include: [
+              paths.appSrc,
+              `${paths.appNodeModules}/react-native-table-component`,
+            ],
             loader: require.resolve('babel-loader'),
             options: {
               customize: require.resolve(
@@ -258,7 +261,7 @@ module.exports = {
                 ],
               ],
               cacheDirectory: true,
-              plugins: ['react-hot-loader/babel'],
+              plugins: ['react-hot-loader/babel', "@babel/plugin-proposal-class-properties"],
               // Don't waste time on Gzipping the cache
               cacheCompression: false,
 
