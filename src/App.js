@@ -123,21 +123,23 @@ class App extends Component {
   render() {
     return (
       <View style={{flex: 1,}}>
-          <Text style={{color: 'black', fontWeight: 'bold', fontSize: 20, paddingTop: 20, paddingBottom:3}}>Token Info</Text>
-          <Text style={{color: 'black', fontSize: 15, paddingBottom: 5}}>Last: {this.state.lastPrice} STEEM, 24h Vol: {this.state.volume} STEEM, Bid: {this.state.highestBid} STEEM, Ask: {this.state.lowestAsk} STEEM</Text>
-          <Text style={{color: 'black', fontWeight: 'bold', fontSize: 16, paddingBottom: 3}}>총 홀더 수 : {this.state.holders.length}</Text>
-          <Text style={{color: 'black', fontWeight: 'bold', fontSize: 16}}>유통물량 : {(this.state.sum_balance*1).toFixed(2)} JJM</Text>
+          <Text style={{color: 'black', fontWeight: 'bold', fontSize: 20, paddingLeft: 20, paddingTop: 20, paddingBottom:3}}>Token Info</Text>
+          <Text style={{color: 'black', fontSize: 15, paddingLeft: 20, paddingBottom: 5}}>Last: {this.state.lastPrice} STEEM, 24h Vol: {this.state.volume} STEEM, Bid: {this.state.highestBid} STEEM, Ask: {this.state.lowestAsk} STEEM</Text>
+          <Text style={{color: 'black', fontWeight: 'bold', fontSize: 16, paddingLeft: 20, paddingBottom: 3}}>총 홀더 수 : {this.state.holders.length}</Text>
+          <Text style={{color: 'black', fontWeight: 'bold', fontSize: 16, paddingLeft: 20}}>유통물량 : {(this.state.sum_balance*1).toFixed(2)} JJM</Text>
 
-      <View style={{flex: 1, flexDirection: 'row', paddingTop: 30}}>
-        <Text style={{flex: 1, color: 'black', fontWeight: 'bold', fontSize: 20, padding: 3}}>Account</Text>
-        <Text style={{flex: 1, color: 'black', fontWeight: 'bold', fontSize: 20, padding: 3}}>Balance</Text>
-        <Text style={{flex: 1,color: 'black', fontWeight: 'bold', fontSize: 20, padding: 3}}>Rate</Text>
-      </View>
+        <View style={{flex: 1, flexDirection: 'row', paddingTop: 30, paddingLeft: 20}}>
+          <Text style={{flex: 1, color: 'black', fontWeight: 'bold', fontSize: 20, padding: 3}}>Account</Text>
+          <Text style={{flex: 1, color: 'black', fontWeight: 'bold', fontSize: 20, padding: 3}}>Balance</Text>
+          <Text style={{flex: 1,color: 'black', fontWeight: 'bold', fontSize: 20, padding: 3}}>Rate</Text>
+        </View>
+        <View style={{flex: 1, paddingLeft: 20}}>
+          <FlatList
+              data= {this.state.holders_data}
+              renderItem={({item}) => <HolderListItem id={item.id} account ={item.account} balance = {item.balance} rate = {item.rate}/>}
+            />
+        </View>
 
-        <FlatList
-          data= {this.state.holders_data}
-          renderItem={({item}) => <HolderListItem id={item.id} account ={item.account} balance = {item.balance} rate = {item.rate}/>}
-        />
       </View>
     );
   }
