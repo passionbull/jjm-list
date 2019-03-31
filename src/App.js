@@ -2,7 +2,8 @@ import React, { Component } from 'react';
 import {
   Platform,
 } from 'react-native';
-import ExampleOne from './View/ExampleOne';
+import PayOut from './Component/Payout';
+import Voting from './Component/Voting';
 import Home from './Component/Home';
 import { Route, Router, Switch } from './Utils/Routing';
 
@@ -13,8 +14,8 @@ class App extends Component {
       <Router>
         <Switch>
           <Route exact path="/" component={Home} />
-          <Route exact path="/voting" component={ExampleOne} />
-          <Route exact path="/payout" component={ExampleOne} />
+          <Route exact path="/voting" component={Voting} />
+          <Route exact path="/payout" component={PayOut} />
         </Switch>
       </Router>
     );

@@ -289,6 +289,9 @@ module.exports = {
             include: [
               paths.appSrc,
               `${paths.appNodeModules}/react-native-table-component`,
+              `${paths.appNodeModules}/native-base-shoutem-theme`,
+              `${paths.appNodeModules}`,
+
             ],
             loader: require.resolve('babel-loader'),
             options: {
