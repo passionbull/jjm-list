@@ -28,6 +28,8 @@
     "react-native": "0.55.x",
     "react-native-table-component": "^1.2.0",
     "react-native-web": "^0.10.x",
+    "react-router-dom": "^5.0.0",
+    "react-router-native": "^5.0.0",
     "sscjs": "0.0.7"
   },
   "devDependencies": {
