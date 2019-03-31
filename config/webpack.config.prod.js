@@ -290,8 +290,8 @@ module.exports = {
               paths.appSrc,
               `${paths.appNodeModules}/react-native-table-component`,
               `${paths.appNodeModules}/native-base-shoutem-theme`,
+              `${paths.appNodeModules}/react-native-drawer`,
               `${paths.appNodeModules}`,
-
             ],
             loader: require.resolve('babel-loader'),
             options: {
