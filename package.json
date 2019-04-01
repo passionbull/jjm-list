@@ -20,6 +20,7 @@
     "deploy": "gh-pages -d build"
   },
   "dependencies": {
+    "dsteem": "^0.11.2",
     "native-base": "^2.12.1",
     "react": "^16.6.x",
     "react-app-polyfill": "^0.1.3",
