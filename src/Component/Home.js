@@ -2,12 +2,12 @@ import React, { Component } from 'react';
 import {
   Text,
   View,
-  Button, StyleSheet
+  Button, StyleSheet, FlatList
 } from 'react-native';
 import SSC from 'sscjs';
 import { withRouter } from '../Utils/Routing';
-import { Table, Row, Rows } from 'react-native-table-component';
-
+// import { Table, Row, Rows } from 'react-native-table-component';
+import HolderListItem from '../View/HolderListItem';
 
 class Home extends Component {
  
@@ -33,7 +33,7 @@ class Home extends Component {
         return (
 
         <View style={{flex: 1,}}>
-            <View style={{flex: 1, flexDirection: 'row', width:220, paddingLeft: 10, paddingTop: 20}}>
+            <View style={{flex: 1, flexDirection: 'row', width:240, paddingLeft: 20, paddingTop: 20}}>
                 <View style={{flex: 1,paddingRight:10}}>
                     <Button style={{}} title='Voting list' onPress={this.onPressButton1}/>
                 </View>
@@ -41,16 +41,28 @@ class Home extends Component {
                     <Button style={{}} title='Payout' onPress={this.onPressButton2}/>
                 </View>
             </View>
-            <Text style={{color: 'black', fontWeight: 'bold', fontSize: 20, paddingLeft: 10, paddingTop: 20, paddingBottom:3}}>Token Info</Text>
-            <Text style={{color: 'black', fontSize: 15, paddingLeft: 10, paddingBottom: 5}}>Last: {this.state.lastPrice} STEEM, 24h Vol: {this.state.volume} STEEM, Bid: {this.state.highestBid} STEEM, Ask: {this.state.lowestAsk} STEEM</Text>
-            <Text style={{color: 'black', fontWeight: 'bold', paddingLeft: 10, fontSize: 16, paddingBottom: 3}}>총 홀더 수 : {this.state.holders.length}</Text>
-            <Text style={{color: 'black', fontWeight: 'bold', paddingLeft: 10, fontSize: 16, paddingBottom: 20}}>유통물량 : {(this.state.sum_balance*1).toFixed(2)} JJM</Text>
-            <View style={{flex: 1,paddingLeft: 10}}>
+            <Text style={{color: 'black', fontWeight: 'bold', fontSize: 20, paddingLeft: 20, paddingTop: 20, paddingBottom:3}}>Token Info</Text>
+            <Text style={{color: 'black', fontSize: 15, paddingLeft: 20, paddingBottom: 5}}>Last: {this.state.lastPrice} STEEM, 24h Vol: {this.state.volume} STEEM, Bid: {this.state.highestBid} STEEM, Ask: {this.state.lowestAsk} STEEM</Text>
+            <Text style={{color: 'black', fontWeight: 'bold', fontSize: 16, paddingLeft: 20, paddingBottom: 3}}>총 홀더 수 : {this.state.holders.length}</Text>
+            <Text style={{color: 'black', fontWeight: 'bold', fontSize: 16, paddingLeft: 20}}>유통물량 : {(this.state.sum_balance*1).toFixed(2)} JJM</Text>
+            <View style={{flex: 1, flexDirection: 'row', paddingTop: 30, paddingLeft: 20}}>
+            <Text style={{flex: 1, color: 'black', fontWeight: 'bold', fontSize: 20, padding: 3}}>Account</Text>
+            <Text style={{flex: 1, color: 'black', fontWeight: 'bold', fontSize: 20, padding: 3}}>Balance</Text>
+            <Text style={{flex: 1,color: 'black', fontWeight: 'bold', fontSize: 20, padding: 3}}>Rate</Text>
+            </View>
+            <View style={{flex: 1, paddingLeft: 20}}>
+            <FlatList
+                data= {this.state.holders_data}
+                renderItem={({item}) => <HolderListItem id={item.id} account ={item.account} balance = {item.balance} rate = {item.rate}/>}
+                />
+            </View>
+
+            {/* <View style={{flex: 1,paddingLeft: 10}}>
                 <Table style={{}} borderStyle={{borderWidth: 2, borderColor: '#c8e1ff'}}>
                     <Row data={this.state.tableHead} style={styles.head} textStyle={{ margin: 6, fontWeight:'bold', fontSize: 18 }}/>
                     <Rows data={this.state.tableData} textStyle={styles.text}/>
                 </Table>
-            </View>
+            </View> */}
         </View>
 
         )

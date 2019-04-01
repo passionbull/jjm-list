@@ -289,9 +289,8 @@ module.exports = {
             include: [
               paths.appSrc,
               `${paths.appNodeModules}/react-native-table-component`,
-              `${paths.appNodeModules}/native-base-shoutem-theme`,
-              `${paths.appNodeModules}/react-native-drawer`,
-              `${paths.appNodeModules}`,
+              `${paths.appNodeModules}/react-router-dom`
+              // `${paths.appNodeModules}`,
             ],
             loader: require.resolve('babel-loader'),
             options: {
@@ -300,7 +299,6 @@ module.exports = {
               ),
               
               plugins: [
-                "@babel/plugin-proposal-class-properties",
                 [ 
                   require.resolve('babel-plugin-named-asset-import'),
                   {
@@ -335,6 +333,7 @@ module.exports = {
                 ],
               ],
               cacheDirectory: true,
+              plugins: ['react-hot-loader/babel', "@babel/plugin-proposal-class-properties"],
               // Save disk space when time isn't as important
               cacheCompression: true,
               

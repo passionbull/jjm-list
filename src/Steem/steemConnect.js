@@ -3,7 +3,7 @@ import sc2 from 'sc2-sdk';
 
 const api = sc2.Initialize({
   app: 'wp-steem-share',
-  callbackURL: 'http://localhost:3000/payout',
+  callbackURL: 'http://localhost:3000/voting',
 	accessToken: 'access_token',
 	scope: ['vote', 'comment', 'custom_json', ]
 });
