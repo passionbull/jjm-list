@@ -45,4 +45,15 @@ export default class steemController{
        });
     }
 
+    getDiscussionsByBlog = (query) => {
+        return new Promise((resolve, reject) => {
+          steem.api.getDiscussionsByBlog(query, function(err, response) {
+         if(err){
+           reject(err);
+         }
+         resolve(response);
+        });
+       });
+    }
+    
 }

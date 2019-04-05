@@ -14,7 +14,7 @@ export default class HolderListItem extends React.PureComponent {
       return (
           <View style={{flex: 1, flexDirection: 'row', paddingTop: 5,}}>
             <View style={{flex: 1, borderWidth: 0.1}}>
-              <Text style={{flex: 1, color: 'black', fontSize: 15, padding: 3}}>{this.props.account}</Text>
+              <Text style={{flex: 1, color: 'black', fontSize: 15, padding: 3}}>{this.props.holderID+'-'+this.props.account}</Text>
             </View>
   
             <View style={{flex: 1, borderWidth:0.1}}>

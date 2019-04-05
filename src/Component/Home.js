@@ -8,6 +8,8 @@ import SSC from 'sscjs';
 import { withRouter } from '../Utils/Routing';
 // import { Table, Row, Rows } from 'react-native-table-component';
 import HolderListItem from '../View/HolderListItem';
+import steemController from '../Steem/steemController'
+var sc = new steemController();
 
 class Home extends Component {
  
@@ -53,7 +55,7 @@ class Home extends Component {
             <View style={{flex: 1, paddingLeft: 20}}>
             <FlatList
                 data= {this.state.holders_data}
-                renderItem={({item}) => <HolderListItem id={item.id} account ={item.account} balance = {item.balance} rate = {item.rate}/>}
+                renderItem={({item}) => <HolderListItem id={item.id} account ={item.account} balance = {item.balance} rate = {item.rate} holderID = {item.hid}/>}
                 />
             </View>
 
@@ -70,6 +72,7 @@ class Home extends Component {
 
 
     sscLoad = (symbol= 'JJM') =>{
+        var that = this;
         const ssc = new SSC('https://api.steem-engine.com/rpc/');
         ssc.stream((err, res) => {
             // console.log(err, res);
@@ -114,22 +117,29 @@ class Home extends Component {
           this.setState({sum_balance: sumBalance});
     
           
-          /// calculate rate
-          for (const holder of tHolders) {
-            holder.rate = holder.balance / sumBalance;
-    
-            for (const mt of this.state.maintainer) {
-              if(holder.account === mt) 
-                holder.rate = 0;
+            /// calculate rate
+            var holder_id = 0;
+            for (const holder of tHolders) {
+                holder_id = holder_id +1;
+                holder.rate = holder.balance / sumBalance;
+                for (const mt of this.state.maintainer) {
+                    if(holder.account === mt) 
+                        holder.rate = 0;
+                    }
+                tData.push({account: holder.account, balance: (holder.balance*1).toFixed(2)+' '+symbol, rate: (holder.rate*1).toFixed(3), 
+                            hid:holder_id})
+                tTableData.push([holder.account, (holder.balance*1).toFixed(2)+' '+symbol, (holder.rate*1).toFixed(3)])
             }
-            tData.push({account: holder.account, balance: (holder.balance*1).toFixed(2)+' '+symbol, rate: (holder.rate*1).toFixed(3)})
-            tTableData.push([holder.account, (holder.balance*1).toFixed(2)+' '+symbol, (holder.rate*1).toFixed(3)])
-          }
-          this.setState({holders: tHolders, holders_data: tData, sum_balance: sumBalance,
-                            tableData:tTableData
-                        });
+            this.setState({holders: tHolders, holders_data: tData, sum_balance: sumBalance,
+                            tableData:tTableData});
+
+            // update holders link and voted
+            holder_id = 0;
+            for (const holder of tHolders) {
+                that.getReculsivePosting(holder.account,'','',that, holder_id);
+                holder_id = holder_id +1;
+            }
         })
-    
     }
 
     findAccount = (holders, account) =>
@@ -141,6 +151,41 @@ class Home extends Component {
       var _symbol = 'JJM'
       this.setState({symbol:_symbol});
       this.sscLoad(_symbol);
+    }
+
+
+    getReculsivePosting(author, start_author= '', start_permlink = '',that, holder_id){
+        const size = 10;
+        var query = {
+            'tag': author,
+            'limit': size,
+            'start_author': start_author,
+            'start_permlink': start_permlink
+        };
+        var dt = new Date();  
+        dt.setDate(dt.getDate() - 1);
+        var startFrom = dt.toISOString().split('.')[0];
+        console.log(startFrom);
+        sc.getDiscussionsByBlog(query).then(function(response) {
+            var length_posts = response.length
+            var c = 0;
+            for (const post of response) {
+                if(post.author === query.tag){
+                    if(post.created > startFrom){
+                        if( c === 0){
+                            console.log('holder_id '+holder_id+'- https://busy.org/@'+post.author+'/'+post.permlink)
+                        }
+                        c = c + 1;
+                    }
+               }
+            }
+            if(length_posts < size || response[length_posts-1].created< startFrom){      
+                return;     
+            } 
+            var start_author= response[length_posts-1].author;
+            var start_permlink= response[length_posts-1].permlink;
+            that.getReculsivePosting(author, start_author, start_permlink,that, holder_id);
+        });
     }
 }
 const styles = StyleSheet.create({

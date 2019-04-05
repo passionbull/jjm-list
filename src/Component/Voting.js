@@ -5,11 +5,9 @@ import {
 } from 'react-native';
 import steemConnect from '../Steem/steemConnect';
 import steem from 'steem'
-import steemController from '../Steem/steemController'
 import VotingListItem from '../View/VotingListItem';
-import {Client} from 'dsteem'
-const client = new Client('https://api.steemit.com')
-
+import steemController from '../Steem/steemController'
+var sc = new steemController();
 
 export default class Voting extends Component {
     state = {
@@ -27,9 +25,8 @@ export default class Voting extends Component {
             this.revokeToken();
     }
     onPressButton2 = async () => {
-        var t = new steemController();
         const size = 10;
-        t.getPosting(size,this, this.state.lp, this.state.la).then(function(posting){
+        sc.getPosting(size,this, this.state.lp, this.state.la).then(function(posting){
             console.log('post',posting.posts);
             var lp = posting.last_permlink;
             var la = posting.last_author;
@@ -40,10 +37,38 @@ export default class Voting extends Component {
     }
     onPressButton3 = () => {
         var _all_post = this.state.all_post;
-        var t = new steemController();
         for (const post of _all_post) {
-            t.getVotingInfo(post);
+            sc.getVotingInfo(post);
         }
+    }
+
+    getReculsivePosting(author, start_author= '', start_permlink = ''){
+        const size = 10;
+        var query = {
+            'tag': author,
+            'limit': size,
+            'start_author': start_author,
+            'start_permlink': start_permlink
+        };
+        var that = this;
+        var dt = new Date();  
+        dt.setDate(dt.getDate() - 6);
+        var startFrom = dt.toISOString().split('.')[0];
+        sc.getDiscussionsByBlog(query).then(function(response) {
+            var length_posts = response.length
+            for (const post of response) {
+                if(post.author === query.tag){
+                    if(post.created > startFrom)
+                        console.log(post);
+                }
+            }
+            if(length_posts < size || response[length_posts-1].created< startFrom){      
+                return;     
+            } 
+            var start_author= response[length_posts-1].author;
+            var start_permlink= response[length_posts-1].permlink;
+            that.getReculsivePosting(author, start_author, start_permlink);
+        });
     }
 
     render() {
@@ -84,7 +109,6 @@ export default class Voting extends Component {
 
     componentDidMount(){
         var link = window.location.href;
-        console.log('xxx',link);
         this.checkToken(link);
 
         this.getAsyncToken().then((token) => {
@@ -105,8 +129,7 @@ export default class Voting extends Component {
                 });
             }
         });
-
-
+        this.getReculsivePosting('jacobyu');
     }
 
     getLoginURL = () =>{
