@@ -110,7 +110,6 @@ export default class Voting extends Component {
     componentDidMount(){
         var link = window.location.href;
         this.checkToken(link);
-
         this.getAsyncToken().then((token) => {
             if(token === null)
             {
@@ -129,7 +128,6 @@ export default class Voting extends Component {
                 });
             }
         });
-        this.getReculsivePosting('jacobyu');
     }
 
     getLoginURL = () =>{

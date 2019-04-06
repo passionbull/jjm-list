@@ -30,11 +30,11 @@ export default class HolderListItem extends React.PureComponent {
             </View>
 
             <View style={{flex: 0.5, borderWidth:0.1}}>
-              <Text style={{flex: 1, color: 'black', fontSize: 15, padding: 3, paddingLeft:10}}>{''+this.props.voted}</Text>
+              <Text style={{flex: 1, color: 'black', fontSize: 15, padding: 3, paddingLeft:10}}>{this.props.voted === undefined? '':''+this.props.voted}</Text>
             </View>
 
             <View style={{flex: 1, borderWidth:0.1}}>
-              <Text style={{flex: 1, color: 'black', fontSize: 15, padding: 3, paddingLeft:10}}>{this.props.latestLink}</Text>
+              <Text style={{flex: 1, color: 'black', fontSize: 15, padding: 3, paddingLeft:10}}>{this.props.voted === undefined? '':this.props.latestLink}</Text>
             </View>
 
 

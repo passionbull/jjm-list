@@ -1,14 +1,15 @@
 import React, { Component } from 'react';
 import {
   Text,
-  View,
-  Button, StyleSheet, FlatList
+  View, AsyncStorage,
+  Button, FlatList, ActivityIndicator
 } from 'react-native';
 import SSC from 'sscjs';
 import { withRouter } from '../Utils/Routing';
-// import { Table, Row, Rows } from 'react-native-table-component';
 import HolderListItem from '../View/HolderListItem';
 import steemController from '../Steem/steemController'
+import steemConnect from '../Steem/steemConnect';
+
 var sc = new steemController();
 
 class Home extends Component {
@@ -17,13 +18,14 @@ class Home extends Component {
         symbol: '',
         maintainer: ['virus707', 'goldenticket', 'jjm13'],
         sum_balance:'',
-        tableHead: ['Account', 'Balance', 'Rate'],
-        tableData:[],
         holderCnt:0, holderAll:0,
-        updated: false, getPostingFromDate: 7
+        updated: true, watingListUpdate: false, getPostingFromDate: 7,
+        modalVisible: false,
+        sign_in: false,
+
     }
 
-    onPressButton1 = () => {
+    getWatingList = () => {
         // update holders link and voted
         this.setState({holderCnt:0, updated:false})
         var holder_id = 0;
@@ -35,11 +37,12 @@ class Home extends Component {
         
         this.setState({holderAll:tHolders.length, show_dt})
         for (const holder of tHolders) {
-            this.getPostingByBlog(holder.account,'','',this, holder_id, tHolders, startDate);
+            this.getPostingByBlog(holder.account,'','',this, holder_id, tHolders, startDate, 0);
             holder_id = holder_id +1;
         }        
     }
-    onPressButton2 = () => {
+
+    filtering = () => {
 
         var holders = this.state.holders_data;
         this.setState({updated:false, holders_data:[]},
@@ -53,8 +56,48 @@ class Home extends Component {
                 // });
 
                 console.log(holders);
-                this.setState({updated:true,holders_data:holders})
+                this.setState({updated:true,holders_data:holders, watingListUpdate:true})
             })
+    }    
+
+    updatedCallback(holders){
+        var cnt = this.state.holderCnt;
+        cnt = cnt + 1;
+        this.setState({holderCnt:cnt})
+        if(cnt === this.state.holderAll)
+        {
+            console.log(holders);
+            this.setState({
+                holders_data:holders,
+                updated:true
+            }, 
+            () => {
+                // window.alert('updated!');
+                this.filtering();
+                  }
+            );
+        }
+    }
+
+    votedReculsive(list, index,length,that){
+        steemConnect.vote(that.state.steem_account,list[index].account, list[index].latest_posting_jjm, list[index].voting_rate*100, function(err,res){
+            console.log('index',index, list[index].account);
+            console.log(err,res);
+            index = index + 1;
+            if(index === length){
+                that.setState({updated:true})
+                window.alert('updated!');
+                return;
+            }
+            that.votedReculsive(list,index,length,that);
+        })
+    }
+
+    actionVoting = () => {
+        var holders = this.state.holders_data;
+        this.setState({updated:false, watingListUpdate:false},()=>{
+            this.votedReculsive(holders,0,holders.length,this);
+        })
     }
 
     render() {
@@ -62,11 +105,15 @@ class Home extends Component {
 
         <View style={{flex: 1,}}>
             <View style={{flex: 1, flexDirection: 'row', width:500, paddingLeft: 20, paddingTop: 20}}>
+                {this.state.updated === true? <View/> :<ActivityIndicator size="large" color="#0000ff" />}
                 <View style={{flex: 1,paddingRight:10}}>
-                    <Button style={{}} title='Waiting list' onPress={this.onPressButton1}/>
+                    <Button style={{}} title='Waiting list' disabled={this.state.updated === true? false:true} onPress={this.getWatingList}/>
+                </View>
+                <View style={{flex: 1,paddingRight:10}}>
+                    <Button style={{}} title='Voting' disabled={this.state.watingListUpdate === true? false:true} onPress={this.actionVoting}/>
                 </View>
                 <View style={{flex: 1,}}>
-                    <Button style={{}} title='Voting' onPress={this.onPressButton2}/>
+                    <Button style={{}} title={this.state.sign_in === false? 'Sign in with SteemConnect':'Sign out'} onPress={this.loginSteemConnect2}/>
                 </View>
             </View>
             <Text style={{color: 'black', fontWeight: 'bold', fontSize: 20, paddingLeft: 20, paddingTop: 20, paddingBottom:3}}>Token Info</Text>
@@ -86,42 +133,17 @@ class Home extends Component {
                 data= {this.state.holders_data}
                 extraData={this.state.updated}
                 renderItem={({item}) => <HolderListItem id={item.id} account ={item.account} balance = {item.balance} voting_rate = {item.voting_rate}
-                rate = {item.rate} holderID = {item.hid} voted = {item.voted} latestLink ={item.latest_posting_jjm}/>}
+                rate = {item.rate} holderID = {item.hid} voted = {item.voted} latestLink ={'https://busy.org/@'+item.account+'/'+item.latest_posting_jjm}/>}
                 />
             </View>
-
-            {/* <View style={{flex: 1,paddingLeft: 10}}>
-                <Table style={{}} borderStyle={{borderWidth: 2, borderColor: '#c8e1ff'}}>
-                    <Row data={this.state.tableHead} style={styles.head} textStyle={{ margin: 6, fontWeight:'bold', fontSize: 18 }}/>
-                    <Rows data={this.state.tableData} textStyle={styles.text}/>
-                </Table>
-            </View> */}
         </View>
 
         )
     }
 
-    updatedCallback(holders){
-        var cnt = this.state.holderCnt;
-        cnt = cnt + 1;
-        this.setState({holderCnt:cnt})
-        if(cnt === this.state.holderAll)
-        {
-            console.log(holders);
-            this.setState({
-                holders_data:holders,
-                updated:true
-            }, 
-            () => {
-                this.onPressButton2();
-                  }
-            );
-        }
-    }
 
 
     sscLoad = (symbol= 'JJM') =>{
-        var that = this;
         const ssc = new SSC('https://api.steem-engine.com/rpc/');
         ssc.stream((err, res) => {
         });
@@ -139,7 +161,6 @@ class Home extends Component {
         ssc.find('tokens', 'balances', {'symbol':symbol}, 1000, 0, [], (err, result) => {
           var tHolders = []
           var tData = []
-          var tTableData = []
     
           result.sort(function (a,b){
             return b.balance - a.balance;
@@ -182,10 +203,8 @@ class Home extends Component {
                 
                 tData.push({account: holder.account, balance: (holder.balance*1)+' '+symbol, rate: (holder.rate*1), 
                             hid:holder_id, voting_rate:voting_rate})
-                tTableData.push([holder.account, (holder.balance*1).toFixed(2)+' '+symbol, (holder.rate*1).toFixed(3)])
             }
-            this.setState({holders: tHolders, holders_data: tData, sum_balance: sumBalance,
-                            tableData:tTableData},
+            this.setState({holders: tHolders, holders_data: tData, sum_balance: sumBalance},
                             () => {
                                     // this.onPressButton1();
                                 }
@@ -202,10 +221,84 @@ class Home extends Component {
       var _symbol = 'JJM'
       this.setState({symbol:_symbol});
       this.sscLoad(_symbol);
+
+      var link = window.location.href;
+      this.checkToken(link);
+      this.getAsyncToken().then((token) => {
+          if(token === null)
+          {
+              this.setState({sign_in:false});
+          }
+          else
+          {
+              // AccessToken 셋팅
+              steemConnect.setAccessToken(token);
+              // 계정 정보 조회
+              steemConnect.me().then(({ account }) => {
+                  
+                  const { profile }  = JSON.parse(account.json_metadata);
+                  console.log('profile', account);
+                  this.setState({sign_in:true,steem_account:account.name});
+              }).catch(function(e){
+              });
+          }
+      });
     }
 
-    getPostingByBlog(author, start_author= '', start_permlink = '',that, holder_id, holders, startDate){
-        const size = 3;
+
+
+    loginSteemConnect2 = () => {
+        // Go to Commit screen
+        if(this.state.sign_in === false)
+            this.getLoginURL();
+        else
+            this.revokeToken();
+    }
+        
+    getLoginURL = () =>{
+        let link = steemConnect.getLoginURL();
+        window.location.href = link;
+    }
+
+    revokeToken = () =>{
+        steemConnect.revokeToken(function (err,res){
+            console.log(res);
+            AsyncStorage.removeItem('token');
+        })
+        this.setState({sign_in:false});
+    }
+
+    checkToken = (url) => {
+        if (url.indexOf('?access_token') > -1) {
+          try {
+            const tokens = {};
+            // 콜백 URL에서 accessToken 정보 추출하기
+            let params = url.split('?')[1];
+            params = params.split('&');
+            params.forEach(e => {
+              const [key, val] = e.split('=');
+              tokens[key] = val;
+            });
+            console.log('tokens:', tokens);
+            AsyncStorage.setItem('token', tokens.access_token);
+          } catch (error) {
+            console.log(error);
+          }
+        }
+      };
+
+    getAsyncToken = async () => {
+        try {
+            const value = await AsyncStorage.getItem('token');
+            return await value;
+        } catch (e) {
+            console.warn(e)
+            return null
+        }
+    };      
+
+    getPostingByBlog(author, start_author= '', start_permlink = '',that, holder_id, holders, startDate, c){
+        const size = 50;
         var query = {
             'tag': author,
             'limit': size,
@@ -213,16 +306,16 @@ class Home extends Component {
             'start_permlink': start_permlink
         };
         sc.getDiscussionsByBlog(query).then(function(response) {
+            var length_posts = response.length
             var voted = false;
             var latest_posting_jjm = ''
-            var c = 0;
             for (const post of response) {
                 if(post.author === query.tag){
                     if(post.created > startDate){
                         if(voted ===false)
                             voted = post.active_votes.find(function(a){return a.voter === 'virus707'});
                         if( c === 0){
-                            latest_posting_jjm = 'https://busy.org/@'+post.author+'/'+post.permlink;
+                            latest_posting_jjm = post.permlink;
                         }
                         if (voted !== undefined)
                             voted = true;
@@ -232,14 +325,20 @@ class Home extends Component {
                     }
                }
             }
-            if(holders[holder_id].account === author){
-                holders[holder_id].voted = voted;
-                holders[holder_id].latest_posting_jjm = latest_posting_jjm;
-                that.updatedCallback(holders);
+            if(length_posts < size || response[length_posts-1].created< startDate){      
+                if(holders[holder_id].account === author){
+                    holders[holder_id].voted = voted;
+                    holders[holder_id].latest_posting_jjm = latest_posting_jjm;
+                    that.updatedCallback(holders);
+                }
+                else{
+                    console.log('something is wrong.');
+                }
+                return;     
             }
-            else{
-                console.log('something is wrong.');
-            }
+            var start_author= response[length_posts-1].author;
+            var start_permlink= response[length_posts-1].permlink;
+            that.getPostingByBlog(author, start_author, start_permlink,that,holder_id,holders,startDate,c);
         });
     }
 }
