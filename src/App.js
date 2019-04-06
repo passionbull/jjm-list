@@ -312,7 +312,7 @@ class App extends Component {
                 if(post.author === query.tag){
                     if(post.created > startDate){
                         if(voted ===false){
-                            voted = post.active_votes.find(function(a){return (a.voter === 'virus707' || a.voter === 'jacobyu')});
+                            voted = post.active_votes.find(function(a){return (a.voter === 'virus707')});
                         }
                         if( c === 0){
                             latest_posting_jjm = post.permlink;

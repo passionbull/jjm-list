@@ -3,7 +3,7 @@ import sc2 from 'sc2-sdk';
 
 const api = sc2.Initialize({
   app: 'wp-steem-share',
-  callbackURL: 'https://passionbull.github.io/jjm-list/',
+  callbackURL: 'https://passionbull.github.io/jjm-list',
 	accessToken: 'access_token',
 	scope: ['vote', 'comment']
 });
