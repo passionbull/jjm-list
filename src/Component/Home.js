@@ -1,17 +1,18 @@
 import React, { Component } from 'react';
 import {
-  Text,Platform,
+  Text,
   View, AsyncStorage,
   Button, FlatList, ActivityIndicator
 } from 'react-native';
 import SSC from 'sscjs';
-import HolderListItem from './View/HolderListItem';
-import steemController from './Steem/steemController'
-import steemConnect from './Steem/steemConnect';
+import { withRouter } from '../Utils/Routing';
+import HolderListItem from '../View/HolderListItem';
+import steemController from '../Steem/steemController'
+import steemConnect from '../Steem/steemConnect';
 
 var sc = new steemController();
 
-class App extends Component {
+class Home extends Component {
     state = {
         holders: [],
         symbol: '',
@@ -343,10 +344,4 @@ class App extends Component {
     }
 }
  
-
-let hotWrapper = () => () => App;
-if (Platform.OS === 'web') {
-  const { hot } = require('react-hot-loader');
-  hotWrapper = hot;
-}
-export default hotWrapper(module)(App);
+export default withRouter(Home);

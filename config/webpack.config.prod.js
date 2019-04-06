@@ -286,8 +286,12 @@ module.exports = {
           // The preset includes JSX, Flow, TypeScript and some ESnext features.
           {
             test: /\.(js|mjs|jsx|ts|tsx)$/,
-            include: paths.appSrc,
-
+            include: [
+              paths.appSrc,
+              `${paths.appNodeModules}/react-native-table-component`,
+              `${paths.appNodeModules}/react-router-dom`
+              // `${paths.appNodeModules}`,
+            ],
             loader: require.resolve('babel-loader'),
             options: {
               customize: require.resolve(
@@ -295,7 +299,7 @@ module.exports = {
               ),
               
               plugins: [
-                [
+                [ 
                   require.resolve('babel-plugin-named-asset-import'),
                   {
                     loaderMap: {
@@ -329,6 +333,7 @@ module.exports = {
                 ],
               ],
               cacheDirectory: true,
+              plugins: ['react-hot-loader/babel', "@babel/plugin-proposal-class-properties"],
               // Save disk space when time isn't as important
               cacheCompression: true,
               

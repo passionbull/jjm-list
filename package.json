@@ -1,6 +1,5 @@
 {
   "name": "jjm_holders",
-  "homepage": "http://passionbull.github.io/jjm-list",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -19,16 +18,22 @@
     "coverage:native": "node scripts/test.js --config \"./config/native.jest.config.js\" --coverage",
     "predeploy": "npm run build",
     "deploy": "gh-pages -d build"
-
   },
   "dependencies": {
+    "dsteem": "^0.11.2",
+    "native-base": "^2.12.1",
     "react": "^16.6.x",
     "react-app-polyfill": "^0.1.3",
     "react-art": "^16.6.x",
     "react-dom": "^16.6.x",
     "react-native": "0.55.x",
+    "react-native-table-component": "^1.2.0",
     "react-native-web": "^0.10.x",
-    "sscjs": "0.0.7"
+    "react-router-dom": "^5.0.0",
+    "react-router-native": "^5.0.0",
+    "sc2-sdk": "^2.0.1",
+    "sscjs": "0.0.7",
+    "steem": "^0.7.4"
   },
   "devDependencies": {
     "@babel/core": "7.1.0",
