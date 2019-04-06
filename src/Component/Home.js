@@ -312,8 +312,9 @@ class Home extends Component {
             for (const post of response) {
                 if(post.author === query.tag){
                     if(post.created > startDate){
-                        if(voted ===false)
-                            voted = post.active_votes.find(function(a){return a.voter === 'virus707'});
+                        if(voted ===false){
+                            voted = post.active_votes.find(function(a){return (a.voter === 'virus707' || a.voter === 'jacobyu')});
+                        }
                         if( c === 0){
                             latest_posting_jjm = post.permlink;
                         }
