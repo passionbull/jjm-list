@@ -12,35 +12,61 @@ import steemController from '../Steem/steemController'
 var sc = new steemController();
 
 class Home extends Component {
- 
     state = {
         holders: [],
         symbol: '',
         maintainer: ['virus707', 'goldenticket', 'jjm13'],
         sum_balance:'',
         tableHead: ['Account', 'Balance', 'Rate'],
-        tableData:[]
+        tableData:[],
+        holderCnt:0, holderAll:0,
+        updated: false, getPostingFromDate: 7
     }
 
     onPressButton1 = () => {
-        // Go to Commit screen
-        this.props.history.push('/voting');
+        // update holders link and voted
+        this.setState({holderCnt:0, updated:false})
+        var holder_id = 0;
+        var dt = new Date();  
+        dt.setDate(dt.getDate() - this.state.getPostingFromDate);
+        var startDate = dt.toISOString().split('.')[0];
+        var show_dt = dt.toLocaleString();
+        var tHolders = this.state.holders_data
+        
+        this.setState({holderAll:tHolders.length, show_dt})
+        for (const holder of tHolders) {
+            this.getPostingByBlog(holder.account,'','',this, holder_id, tHolders, startDate);
+            holder_id = holder_id +1;
+        }        
     }
     onPressButton2 = () => {
-        // Go to Commit screen
-        this.props.history.push('/payout');
+
+        var holders = this.state.holders_data;
+        this.setState({updated:false, holders_data:[]},
+            () => {
+                window.alert('updated!');
+                holders = holders.filter(item => item.voted !== true)
+                holders = holders.filter(item => item.latest_posting_jjm !== "")
+                holders = holders.filter(item => item.balance !== "0 JJM")
+                // holders.sort(function(x, y) {
+                //     return (x.voted === y.voted)? 0 : x.voted? 1 : -1;
+                // });
+
+                console.log(holders);
+                this.setState({updated:true,holders_data:holders})
+            })
     }
 
     render() {
         return (
 
         <View style={{flex: 1,}}>
-            <View style={{flex: 1, flexDirection: 'row', width:240, paddingLeft: 20, paddingTop: 20}}>
+            <View style={{flex: 1, flexDirection: 'row', width:500, paddingLeft: 20, paddingTop: 20}}>
                 <View style={{flex: 1,paddingRight:10}}>
-                    <Button style={{}} title='Voting list' onPress={this.onPressButton1}/>
+                    <Button style={{}} title='Waiting list' onPress={this.onPressButton1}/>
                 </View>
                 <View style={{flex: 1,}}>
-                    <Button style={{}} title='Payout' onPress={this.onPressButton2}/>
+                    <Button style={{}} title='Voting' onPress={this.onPressButton2}/>
                 </View>
             </View>
             <Text style={{color: 'black', fontWeight: 'bold', fontSize: 20, paddingLeft: 20, paddingTop: 20, paddingBottom:3}}>Token Info</Text>
@@ -50,12 +76,17 @@ class Home extends Component {
             <View style={{flex: 1, flexDirection: 'row', paddingTop: 30, paddingLeft: 20}}>
             <Text style={{flex: 1, color: 'black', fontWeight: 'bold', fontSize: 20, padding: 3}}>Account</Text>
             <Text style={{flex: 1, color: 'black', fontWeight: 'bold', fontSize: 20, padding: 3}}>Balance</Text>
-            <Text style={{flex: 1,color: 'black', fontWeight: 'bold', fontSize: 20, padding: 3}}>Rate</Text>
+            <Text style={{flex: 0.5,color: 'black', fontWeight: 'bold', fontSize: 20, padding: 3}}>Stake</Text>
+            <Text style={{flex: 0.5,color: 'black', fontWeight: 'bold', fontSize: 20, padding: 3}}>Voting Percent</Text>
+            <Text style={{flex: 0.5,color: 'black', fontWeight: 'bold', fontSize: 20, padding: 3}}>Voted after {this.state.show_dt}</Text>
+            <Text style={{flex: 1,color: 'black', fontWeight: 'bold', fontSize: 20, padding: 3}}>Latest link</Text>
             </View>
             <View style={{flex: 1, paddingLeft: 20}}>
             <FlatList
                 data= {this.state.holders_data}
-                renderItem={({item}) => <HolderListItem id={item.id} account ={item.account} balance = {item.balance} rate = {item.rate} holderID = {item.hid}/>}
+                extraData={this.state.updated}
+                renderItem={({item}) => <HolderListItem id={item.id} account ={item.account} balance = {item.balance} voting_rate = {item.voting_rate}
+                rate = {item.rate} holderID = {item.hid} voted = {item.voted} latestLink ={item.latest_posting_jjm}/>}
                 />
             </View>
 
@@ -70,12 +101,29 @@ class Home extends Component {
         )
     }
 
+    updatedCallback(holders){
+        var cnt = this.state.holderCnt;
+        cnt = cnt + 1;
+        this.setState({holderCnt:cnt})
+        if(cnt === this.state.holderAll)
+        {
+            console.log(holders);
+            this.setState({
+                holders_data:holders,
+                updated:true
+            }, 
+            () => {
+                this.onPressButton2();
+                  }
+            );
+        }
+    }
+
 
     sscLoad = (symbol= 'JJM') =>{
         var that = this;
         const ssc = new SSC('https://api.steem-engine.com/rpc/');
         ssc.stream((err, res) => {
-            // console.log(err, res);
         });
     
         ssc.find('market', 'metrics', {'symbol':symbol}, 1000, 0, [], (err, result) => {
@@ -99,7 +147,6 @@ class Home extends Component {
           for (var holder of result) {
             tHolders.push(holder)
           }
-          console.log(tHolders);
           var sumBalance = 0;
     
           /// add all balances
@@ -113,7 +160,6 @@ class Home extends Component {
             if(maintainer !== undefined) 
               sumBalance = sumBalance - maintainer.balance;
           }
-          console.log('sum balance : '+ sumBalance);
           this.setState({sum_balance: sumBalance});
     
           
@@ -126,19 +172,24 @@ class Home extends Component {
                     if(holder.account === mt) 
                         holder.rate = 0;
                     }
-                tData.push({account: holder.account, balance: (holder.balance*1).toFixed(2)+' '+symbol, rate: (holder.rate*1).toFixed(3), 
-                            hid:holder_id})
+                var voting_rate = 1;
+                if(holder.balance/1000 > 45)
+                    voting_rate = voting_rate + 45;
+                else
+                    voting_rate = voting_rate + Math.floor(holder.balance/1000);
+                
+                
+                
+                tData.push({account: holder.account, balance: (holder.balance*1)+' '+symbol, rate: (holder.rate*1), 
+                            hid:holder_id, voting_rate:voting_rate})
                 tTableData.push([holder.account, (holder.balance*1).toFixed(2)+' '+symbol, (holder.rate*1).toFixed(3)])
             }
             this.setState({holders: tHolders, holders_data: tData, sum_balance: sumBalance,
-                            tableData:tTableData});
-
-            // update holders link and voted
-            holder_id = 0;
-            for (const holder of tHolders) {
-                that.getReculsivePosting(holder.account,'','',that, holder_id);
-                holder_id = holder_id +1;
-            }
+                            tableData:tTableData},
+                            () => {
+                                    // this.onPressButton1();
+                                }
+                          );
         })
     }
 
@@ -153,45 +204,44 @@ class Home extends Component {
       this.sscLoad(_symbol);
     }
 
-
-    getReculsivePosting(author, start_author= '', start_permlink = '',that, holder_id){
-        const size = 10;
+    getPostingByBlog(author, start_author= '', start_permlink = '',that, holder_id, holders, startDate){
+        const size = 3;
         var query = {
             'tag': author,
             'limit': size,
             'start_author': start_author,
             'start_permlink': start_permlink
         };
-        var dt = new Date();  
-        dt.setDate(dt.getDate() - 1);
-        var startFrom = dt.toISOString().split('.')[0];
-        console.log(startFrom);
         sc.getDiscussionsByBlog(query).then(function(response) {
-            var length_posts = response.length
+            var voted = false;
+            var latest_posting_jjm = ''
             var c = 0;
             for (const post of response) {
                 if(post.author === query.tag){
-                    if(post.created > startFrom){
+                    if(post.created > startDate){
+                        if(voted ===false)
+                            voted = post.active_votes.find(function(a){return a.voter === 'virus707'});
                         if( c === 0){
-                            console.log('holder_id '+holder_id+'- https://busy.org/@'+post.author+'/'+post.permlink)
+                            latest_posting_jjm = 'https://busy.org/@'+post.author+'/'+post.permlink;
                         }
+                        if (voted !== undefined)
+                            voted = true;
+                        else if(voted === undefined)
+                            voted = false;
                         c = c + 1;
                     }
                }
             }
-            if(length_posts < size || response[length_posts-1].created< startFrom){      
-                return;     
-            } 
-            var start_author= response[length_posts-1].author;
-            var start_permlink= response[length_posts-1].permlink;
-            that.getReculsivePosting(author, start_author, start_permlink,that, holder_id);
+            if(holders[holder_id].account === author){
+                holders[holder_id].voted = voted;
+                holders[holder_id].latest_posting_jjm = latest_posting_jjm;
+                that.updatedCallback(holders);
+            }
+            else{
+                console.log('something is wrong.');
+            }
         });
     }
 }
-const styles = StyleSheet.create({
-    container: { flex: 1, padding: 16, paddingTop: 30, backgroundColor: '#fff' },
-    head: { height: 40, backgroundColor: '#f1f8ff'},
-    text: { margin: 6 }
-  });
  
 export default withRouter(Home);
