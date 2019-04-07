@@ -31,12 +31,19 @@ class App extends Component {
         var dt = new Date();  
         dt.setDate(dt.getDate() - this.state.getPostingFromDate);
         var startDate = dt.toISOString().split('.')[0];
-        var show_dt = dt.toLocaleString();
+        var show_posting_time = dt.toLocaleString();
+
+        var voterDate = new Date();  
+        voterDate.setDate(voterDate.getDate() - 1);
+        var show_voter_time = voterDate.toLocaleString();
+        voterDate = voterDate.toISOString().split('.')[0];
+        
+
         var tHolders = this.state.holders_data
         
-        this.setState({holderAll:tHolders.length, show_dt})
+        this.setState({holderAll:tHolders.length, show_posting_time, show_voter_time})
         for (const holder of tHolders) {
-            this.getPostingByBlog(holder.account,'','',this, holder_id, tHolders, startDate, 0);
+            this.getPostingByBlog(holder.account,'','',this, holder_id, tHolders, startDate, voterDate, 0);
             holder_id = holder_id +1;
         }        
     }
@@ -124,8 +131,8 @@ class App extends Component {
             <Text style={{flex: 1, color: 'black', fontWeight: 'bold', fontSize: 20, padding: 3}}>Balance</Text>
             <Text style={{flex: 0.5,color: 'black', fontWeight: 'bold', fontSize: 20, padding: 3}}>Stake</Text>
             <Text style={{flex: 0.5,color: 'black', fontWeight: 'bold', fontSize: 20, padding: 3}}>Voting Percent</Text>
-            <Text style={{flex: 0.5,color: 'black', fontWeight: 'bold', fontSize: 20, padding: 3}}>Voted after {this.state.show_dt}</Text>
-            <Text style={{flex: 1,color: 'black', fontWeight: 'bold', fontSize: 20, padding: 3}}>Latest link</Text>
+            <Text style={{flex: 0.5,color: 'black', fontWeight: 'bold', fontSize: 20, padding: 3}}>Voted after {this.state.show_voter_time}</Text>
+            <Text style={{flex: 1,color: 'black', fontWeight: 'bold', fontSize: 20, padding: 3}}>Latest link after {this.state.show_posting_time}</Text>
             </View>
             <View style={{flex: 1, paddingLeft: 20}}>
             <FlatList
@@ -296,7 +303,7 @@ class App extends Component {
         }
     };      
 
-    getPostingByBlog(author, start_author= '', start_permlink = '',that, holder_id, holders, startDate, c){
+    getPostingByBlog(author, start_author= '', start_permlink = '',that, holder_id, holders, startDate, voterDate, c){
         const size = 50;
         var query = {
             'tag': author,
@@ -310,7 +317,7 @@ class App extends Component {
             var latest_posting_jjm = ''
             for (const post of response) {
                 if(post.author === query.tag){
-                    if(post.created > startDate){
+                    if(post.created > voterDate){
                         if(voted ===false){
                             voted = post.active_votes.find(function(a){return (a.voter === 'virus707')});
                         }
@@ -338,7 +345,7 @@ class App extends Component {
             }
             var start_author= response[length_posts-1].author;
             var start_permlink= response[length_posts-1].permlink;
-            that.getPostingByBlog(author, start_author, start_permlink,that,holder_id,holders,startDate,c);
+            that.getPostingByBlog(author, start_author, start_permlink,that,holder_id,holders,startDate, voterDate, c);
         });
     }
 }
