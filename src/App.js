@@ -56,7 +56,7 @@ class App extends Component {
                 window.alert('updated!');
                 holders = holders.filter(item => item.voted !== true)
                 holders = holders.filter(item => item.latest_posting_jjm !== "")
-                holders = holders.filter(item => item.balance !== "0 JJM")
+                holders = holders.filter(item => item.balance >=100)
                 // holders.sort(function(x, y) {
                 //     return (x.voted === y.voted)? 0 : x.voted? 1 : -1;
                 // });
@@ -138,7 +138,7 @@ class App extends Component {
             <FlatList
                 data= {this.state.holders_data}
                 extraData={this.state.updated}
-                renderItem={({item}) => <HolderListItem id={item.id} account ={item.account} balance = {item.balance} voting_rate = {item.voting_rate}
+                renderItem={({item}) => <HolderListItem id={item.id} account ={item.account} balance = { (1*item.balance).toFixed(2)+' '+this.state.symbol} voting_rate = {item.voting_rate}
                 rate = {item.rate} holderID = {item.hid} voted = {item.voted} latestLink ={'https://busy.org/@'+item.account+'/'+item.latest_posting_jjm}/>}
                 />
             </View>
@@ -188,9 +188,11 @@ class App extends Component {
               sumBalance = sumBalance - maintainer.balance;
           }
           this.setState({sum_balance: sumBalance});
-    
-          
-            /// calculate rate
+
+          // filtering balance more than 0
+          tHolders = tHolders.filter(item => (item.balance*1) > 0)
+
+          /// calculate rate
             var holder_id = 0;
             for (const holder of tHolders) {
                 holder_id = holder_id +1;
@@ -207,7 +209,7 @@ class App extends Component {
                 
                 
                 
-                tData.push({account: holder.account, balance: (holder.balance*1)+' '+symbol, rate: (holder.rate*1), 
+                tData.push({account: holder.account, balance: holder.balance, rate: (holder.rate*1), 
                             hid:holder_id, voting_rate:voting_rate})
             }
             this.setState({holders: tHolders, holders_data: tData, sum_balance: sumBalance},
