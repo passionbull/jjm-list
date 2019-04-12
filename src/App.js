@@ -40,6 +40,8 @@ class App extends Component {
         
 
         var tHolders = this.state.holders_data
+        tHolders = tHolders.filter(item => item.balance >=100)
+
         
         this.setState({holderAll:tHolders.length, show_posting_time, show_voter_time})
         for (const holder of tHolders) {
@@ -319,7 +321,9 @@ class App extends Component {
             var latest_posting_jjm = ''
             for (const post of response) {
                 if(post.author === query.tag){
-                    if(post.created > voterDate){
+                    var json_meta = JSON.parse(post.json_metadata);
+                    var isJJM = json_meta.tags.find(function(a){return a === 'jjm';});
+                    if(post.created > voterDate && isJJM === 'jjm' ){
                         if(voted ===false){
                             voted = post.active_votes.find(function(a){return (a.voter === 'virus707')});
                         }
