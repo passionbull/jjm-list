@@ -21,6 +21,9 @@ class App extends Component {
         updated: true, watingListUpdate: false, getPostingFromDate: 7,
         modalVisible: false,
         sign_in: false,
+        prefix_text: ["Congratulations on your decision to become a holder in JJM. Did you know that the daily upvote is increasing for 1% for each 1000JJM you are holding? Get a max of 46% upvote from @virus707's 450K SP which would equal holding 45,000JJM.",
+                      "Thank you for considering investing your precious resources in JJM. JJM is a token based on steem-engine.com using a side chain of Steem. With a holding Steem Power of 500K SP owned and bought from @virus707, this SP is used in combination with JJM tokens to upvote, reward and distribute dividends out of the JJM project to JJM token holders.",
+                      "Thank you for your continued support towards JJM. For each 1000 JJM you are holding, you can get an additional 1% of upvote. 10,000JJM would give you a 11% daily voting from the 450K SP virus707 account."]
 
     }
 
@@ -90,14 +93,25 @@ class App extends Component {
     votedReculsive(list, index,length,that){
         steemConnect.vote(that.state.steem_account,list[index].account, list[index].latest_posting_jjm, list[index].voting_rate*100, function(err,res){
             console.log('index',index, list[index].account);
-            console.log(err,res);
-            index = index + 1;
-            if(index === length){
-                that.setState({updated:true})
-                window.alert('updated!');
-                return;
-            }
-            that.votedReculsive(list,index,length,that);
+            console.log('voting',err,res);
+            var text =  that.state.prefix_text[Math.floor(Math.random() * 3)]
+            var permlink = 're-' + list[index].latest_posting_jjm + '-' + Math.floor(Date.now() / 1000);
+            var jsonMetadata =
+            {
+              "tags": ['jjm'],
+            };        
+
+            // console.log( list[index].account, list[index].latest_posting_jjm, that.state.steem_account, permlink, '', text )
+            steemConnect.comment(list[index].account, list[index].latest_posting_jjm, that.state.steem_account, permlink, '', text, jsonMetadata, function (err, res) {
+                console.log('comment',err,res);
+                index = index + 1;
+                if(index === length){
+                    that.setState({updated:true})
+                    window.alert('updated!');
+                    return;
+                }
+                that.votedReculsive(list,index,length,that);
+            });
         })
     }
 
