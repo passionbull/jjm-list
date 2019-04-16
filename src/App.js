@@ -94,7 +94,7 @@ class App extends Component {
         steemConnect.vote(that.state.steem_account,list[index].account, list[index].latest_posting_jjm, list[index].voting_rate*100, function(err,res){
             console.log('index',index, list[index].account);
             console.log('voting',err,res);
-            var text =  that.state.prefix_text[Math.floor(Math.random() * 3)]
+            var text =  that.state.prefix_text[Math.floor(Math.random() * that.state.prefix_text.length)]
             var permlink = 're-' + list[index].latest_posting_jjm + '-' + Math.floor(Date.now() / 1000);
             var jsonMetadata =
             {
@@ -267,9 +267,27 @@ class App extends Component {
               });
           }
       });
+
+      this.getPreFixedMessage(this);
     }
 
-
+    getPreFixedMessage(that) {
+        return fetch('https://s3.ap-northeast-2.amazonaws.com/img.passionbull.net/test/jjm-voting-message.json',{mode: 'cors'})
+          .then((response) => response.json())
+          .then((responseJson) => {
+              var votingMessage = [];
+              for (const msg of responseJson.message) {
+                    votingMessage.push(msg.text)
+              }
+              that.setState({prefix_text:votingMessage}, () =>{
+                //   console.log(that.state.prefix_text)
+              })
+            return responseJson.message;
+          })
+          .catch((error) => {
+            console.error(error);
+          });
+      }
 
     loginSteemConnect2 = () => {
         // Go to Commit screen
