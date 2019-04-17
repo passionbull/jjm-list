@@ -280,7 +280,7 @@ class App extends Component {
                     votingMessage.push(msg.text)
               }
               that.setState({prefix_text:votingMessage}, () =>{
-                //   console.log(that.state.prefix_text)
+                  console.log(that.state.prefix_text)
               })
             return responseJson.message;
           })
