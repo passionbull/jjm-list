@@ -101,9 +101,20 @@ class App extends Component {
               "tags": ['jjm'],
             };        
 
-            // console.log( list[index].account, list[index].latest_posting_jjm, that.state.steem_account, permlink, '', text )
-            steemConnect.comment(list[index].account, list[index].latest_posting_jjm, that.state.steem_account, permlink, '', text, jsonMetadata, function (err, res) {
-                console.log('comment',err,res);
+            if(that.state.steem_account == 'virus707'){
+                // console.log( list[index].account, list[index].latest_posting_jjm, that.state.steem_account, permlink, '', text )
+                steemConnect.comment(list[index].account, list[index].latest_posting_jjm, that.state.steem_account, permlink, '', text, jsonMetadata, function (err, res) {
+                    console.log('comment',err,res);
+                    index = index + 1;
+                    if(index === length){
+                        that.setState({updated:true})
+                        window.alert('updated!');
+                        return;
+                    }
+                    that.votedReculsive(list,index,length,that);
+                });
+            }
+            else{
                 index = index + 1;
                 if(index === length){
                     that.setState({updated:true})
@@ -111,7 +122,7 @@ class App extends Component {
                     return;
                 }
                 that.votedReculsive(list,index,length,that);
-            });
+            }
         })
     }
 
