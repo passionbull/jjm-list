@@ -1,13 +1,13 @@
 {
-  "main.css": "/jjm-list/static/css/main.86ec1e6f.chunk.css",
-  "main.js": "/jjm-list/static/js/main.aafc04fb.chunk.js",
-  "main.js.map": "/jjm-list/static/js/main.aafc04fb.chunk.js.map",
-  "static/js/1.d09b8a27.chunk.js": "/jjm-list/static/js/1.d09b8a27.chunk.js",
-  "static/js/1.d09b8a27.chunk.js.map": "/jjm-list/static/js/1.d09b8a27.chunk.js.map",
+  "main.css": "/jjm-list/static/css/main.76788ef5.chunk.css",
+  "main.js": "/jjm-list/static/js/main.fdcc8fc4.chunk.js",
+  "main.js.map": "/jjm-list/static/js/main.fdcc8fc4.chunk.js.map",
+  "static/js/1.27475520.chunk.js": "/jjm-list/static/js/1.27475520.chunk.js",
+  "static/js/1.27475520.chunk.js.map": "/jjm-list/static/js/1.27475520.chunk.js.map",
   "runtime~main.js": "/jjm-list/static/js/runtime~main.8835fed0.js",
   "runtime~main.js.map": "/jjm-list/static/js/runtime~main.8835fed0.js.map",
-  "static/css/main.86ec1e6f.chunk.css.map": "/jjm-list/static/css/main.86ec1e6f.chunk.css.map",
+  "static/css/main.76788ef5.chunk.css.map": "/jjm-list/static/css/main.76788ef5.chunk.css.map",
   "index.html": "/jjm-list/index.html",
-  "precache-manifest.5d581ce2a936fa6a7d502426320b1910.js": "/jjm-list/precache-manifest.5d581ce2a936fa6a7d502426320b1910.js",
+  "precache-manifest.5c0c112446c36547c2035c63878ec7ab.js": "/jjm-list/precache-manifest.5c0c112446c36547c2035c63878ec7ab.js",
   "service-worker.js": "/jjm-list/service-worker.js"
 }
