@@ -8,8 +8,9 @@ import SSC from 'sscjs';
 import HolderListItem from './View/HolderListItem';
 import steemController from './Steem/steemController'
 import steemConnect from './Steem/steemConnect';
-
+import sscController from './Steem/SSCLoader'
 var sc = new steemController();
+var sscCon = new sscController();
 
 class App extends Component {
     state = {
@@ -177,6 +178,7 @@ class App extends Component {
 
 
     sscLoad = (symbol= 'JJM') =>{
+    
         const ssc = new SSC('https://api.steem-engine.com/rpc/');
         ssc.stream((err, res) => {
         });
@@ -190,8 +192,10 @@ class App extends Component {
           });
         });
     
-    
-        ssc.find('tokens', 'balances', {'symbol':symbol}, 1000, 0, [], (err, result) => {
+
+
+        sscCon.getHoldersAsync(symbol).then( result =>{
+
           var tHolders = []
           var tData = []
     
@@ -233,9 +237,6 @@ class App extends Component {
                     voting_rate = voting_rate + 45;
                 else
                     voting_rate = voting_rate + Math.floor(holder.balance/1000);
-                
-                
-                
                 tData.push({account: holder.account, balance: holder.balance, rate: (holder.rate*1), 
                             hid:holder_id, voting_rate:voting_rate})
             }
@@ -381,7 +382,6 @@ class App extends Component {
                     }
                }
             }
-            if(length_posts < size || response[length_posts-1].created< startDate){      
                 if(holders[holder_id].account === author){
                     holders[holder_id].voted = voted;
                     holders[holder_id].latest_posting_jjm = latest_posting_jjm;
@@ -390,11 +390,10 @@ class App extends Component {
                 else{
                     console.log('something is wrong.');
                 }
-                return;     
-            }
-            var start_author= response[length_posts-1].author;
-            var start_permlink= response[length_posts-1].permlink;
-            that.getPostingByBlog(author, start_author, start_permlink,that,holder_id,holders,startDate, voterDate, c);
+            
+            // var start_author= response[length_posts-1].author;
+            // var start_permlink= response[length_posts-1].permlink;
+            // that.getPostingByBlog(author, start_author, start_permlink,that,holder_id,holders,startDate, voterDate, c);
         });
     }
 }
