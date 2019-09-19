@@ -102,7 +102,7 @@ class App extends Component {
               "tags": ['jjm'],
             };        
 
-            if(that.state.steem_account == 'virus707'){
+            if(that.state.steem_account == 'null'){
                 // console.log( list[index].account, list[index].latest_posting_jjm, that.state.steem_account, permlink, '', text )
                 steemConnect.comment(list[index].account, list[index].latest_posting_jjm, that.state.steem_account, permlink, '', text, jsonMetadata, function (err, res) {
                     console.log('comment',err,res);
